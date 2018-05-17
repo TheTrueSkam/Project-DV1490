@@ -1,10 +1,10 @@
 #include "List.h"
 #include <iostream>
-#include <fstream>
+
+using namespace std;
 
 int main()
 {
-	ifstream file;
 
 	getchar();
 	return 0;
