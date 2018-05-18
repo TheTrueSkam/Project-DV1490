@@ -9,18 +9,17 @@ private:
 	public:
 		T element;
 		Node* next;
-		Node(T element, Node* next) 
+		Node(T element, Node* next)
 		{
 			this->element = element;
 			this->next = next;
 		}
-		~Node() 
-		{
-		}
+		~Node() { }
 	};
 	Node* first;
 	Node* last;
 	int nrOfNode;
+
 public:
 	List();
 	virtual ~List();
@@ -33,6 +32,8 @@ public:
 	bool findElement(const T& toFind) const;
 	int length() const;
 	void getAll(T arr[], int cap) throw(...);
+	void insertAtLast(const T& element);
+	T takeFirst() throw(...);
 };
 
 template<typename T>
@@ -68,32 +69,31 @@ List<T>::~List()
 }
 
 template<typename T>
- List<T>::List(const List & other)
+List<T>::List(const List & other)
 {
-	 this->first = nullptr;
-	 this->last = nullptr;
-	 this->nrOfNode = other.nrOfNode;
+	this->first = nullptr;
+	this->last = nullptr;
+	this->nrOfNode = other.nrOfNode;
 
-	 Node* oldWalker;
-	 Node* newWalker;
-	 oldWalker = other.first;
-	 newWalker = this->first;
-	 for (int i = 0; i < this->nrOfNode; i++)
-	 {
-		 Node* newNode = new Node(oldWalker->element, nullptr);
-		 if (i == 0)
-		 {
-			 this->first = newNode;
-			 newWalker = this->first;
-		 }
-		 else
-		 {
-			 newWalker->next = newNode;
-			 newWalker = newWalker->next;
-		 }
-		 this->last = newWalker;
-		 oldWalker = oldWalker->next;
-	 }
+	Node* oldWalker = other.first;
+	Node* newWalker = this->first;
+
+	for (int i = 0; i < this->nrOfNode; i++)
+	{
+		Node* newNode = new Node(oldWalker->element, nullptr);
+		if (i == 0)
+		{
+			this->first = newNode;
+			newWalker = this->first;
+		}
+		else
+		{
+			newWalker->next = newNode;
+			newWalker = newWalker->next;
+		}
+		this->last = newWalker;
+		oldWalker = oldWalker->next;
+	}
 }
 
 template<typename T>
@@ -180,7 +180,7 @@ void List<T>::insertAt(int pos, const T & element) throw(...)
 		Node* walker;
 		walker = this->first;
 		//Låt den gå så många steg som platsen - 1 
-		for (int i = 0; i < pos-1; i++)
+		for (int i = 0; i < pos - 1; i++)
 		{
 			walker = walker->next;
 		}
@@ -218,9 +218,9 @@ T List<T>::getAt(int pos) const throw(...)
 }
 
 template<typename T>
- void List<T>::removeAt(int pos) throw(...)
+void List<T>::removeAt(int pos) throw(...)
 {
-	 //Kolla om platsen finns eller om listan är tom
+	//Kolla om platsen finns eller om listan är tom
 	if (this->nrOfNode < pos || pos < 0 || this->first == nullptr)
 	{
 		throw "Posistion don't exist";
@@ -312,7 +312,7 @@ bool List<T>::removeElement(const T & element)
 }
 
 template<typename T>
- bool List<T>::findElement(const T & toFind) const
+bool List<T>::findElement(const T & toFind) const
 {
 	bool find = false;
 	//Kolla så inte listan är tom
@@ -320,7 +320,7 @@ template<typename T>
 	{
 		//Skapa en walker och sätt den på första noden
 		Node* walker;
-		walker = this->first;	
+		walker = this->first;
 		//Gå igenom alla nodes till den hittar elementet eller blir en nullptr
 		while (walker->next != nullptr && walker->element != toFind)
 		{
@@ -343,9 +343,9 @@ int List<T>::length() const
 }
 
 template<typename T>
- void List<T>::getAll(T arr[], int cap) throw(...)
+void List<T>::getAll(T arr[], int cap) throw(...)
 {
-	 //Kolla så capasiteten är tillräckligt stor
+	//Kolla så capasiteten är tillräckligt stor
 	if (this->nrOfNode > cap)
 	{
 		throw "Cap is not enuth";
@@ -357,3 +357,39 @@ template<typename T>
 	}
 }
 
+template<typename T>
+void List<T>::insertAtLast(const T & element)
+{
+	Node* newNode = new Node(element, nullptr);
+	if (this->nrOfNode == 0)
+	{
+		this->first = newNode;
+	}
+	else
+	{
+		this->last->next = newNode;
+	}
+	this->last = newNode;
+	this->nrOfNode++;
+}
+
+template<typename T>
+T List<T>::takeFirst()
+{
+	if (this->nrOfNode <= 0)
+	{
+		throw "List is empty!";
+	}
+
+	T temp = this->first->element;
+	Node *walker = this->first;
+
+	this->first = walker->next;
+	if (walker == this->last)
+	{
+		this->last = nullptr;
+	}
+	delete walker;
+
+	return temp;
+}
