@@ -1,10 +1,11 @@
-#include "List.h"
-#include <iostream>
-
-using namespace std;
+#include "OperationHandler.h"
 
 int main()
 {
+	OperationHandler handler;
+
+	handler.readOperations("Operationer_1a.txt");
+	handler.schedule(660, 3);
 
 	getchar();
 	return 0;
