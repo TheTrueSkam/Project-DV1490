@@ -1,0 +1,6 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Project DV1490.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  main.cpp
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  OperationHandler.cpp
+  Project DV1490.vcxproj -> C:\Users\danla\OneDrive\Desktop\Project-DV1490-master\Project DV1490\x64\Debug\Project DV1490 Uppdated.exe
