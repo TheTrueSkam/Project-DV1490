@@ -390,6 +390,7 @@ T List<T>::takeFirst()
 		this->last = nullptr;
 	}
 	delete walker;
+	this->nrOfNode--;
 
 	return temp;
 }
