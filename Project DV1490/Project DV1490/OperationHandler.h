@@ -15,18 +15,22 @@ private:
 
 	// Operation *operationRooms[3]; // Första array täcker antalet salar, i vårt fall 3. Andra värdet antalet "operationspass".
 	Operation **operationRooms;
+	int days;
 	int rooms;
+	int roomsOverDays;
 	int *timeLeft;
+	int *totalTimeOfDay;
 	int shortTime;
-	int nrOffPosibleOperations;
+	int nrOfPossibleOperations;
 	void expand();
 public:
-	OperationHandler(int rooms = 0, int time = 0, bool sametime = true);
+	OperationHandler(int rooms = 0, int time = 0, bool sametime = true, int dayAmmount = 1);
 	~OperationHandler();
-	// OperationHandler(const OperationHandler& other);
+	OperationHandler(const OperationHandler& other);
 	void readOperations(string filename);
-	void schedule(); // Här sker själva "algoritmen"
+	void schedule(int updatesPerDay); // Här sker själva "algoritmen"
 	void printOperations();
 	void swap(Operation &one, Operation &two);
+	OperationHandler& operator=(const OperationHandler &origObj);
 };
 #endif // !OPERATIONHANDLER_H
