@@ -1,5 +1,6 @@
 #include "OperationHandler.h"
 #include <iostream>
+#include <ctime>
 
 void OperationHandler::expand()
 {
@@ -172,6 +173,8 @@ void OperationHandler::readOperations(string filename)
 
 void OperationHandler::schedule(int updatesPerDay)
 {
+	clock_t startOp;
+	clock_t endOp;
 	bool timeFind = false;
 	int counterRooms = 0;
 	int nrOffOperations = this->theOperations.length();
@@ -184,34 +187,24 @@ void OperationHandler::schedule(int updatesPerDay)
 	
 	for (int currentDay = 1; currentDay <= this->days; currentDay++)
 	{
-		for (int updates = 0; updates < updatesPerDay; updates++)
-		{
-			cout << "----- ROUND " << updates + 1 << " DAY " << currentDay << " -----" << endl;
-			for (int currentRoom = (this->rooms * currentDay) - this->rooms; currentRoom < (this->rooms * currentDay); currentRoom++)
+	//	for (int updates = 0; updates < updatesPerDay; updates++)
+	//	{
+			 /*<< "----- ROUND " << updates + 1*/ 
+			cout << endl << "----- ROUND 1" << " DAY " << currentDay << " -----" << endl;
+			startOp = clock();
+			int stopLoop = 0;
+			// Läser in operationer så länge det går på samtliga operationssalar.
+			for (int i = 0; i < nrOffOperations && this->theOperations.length() != 0 && stopLoop != this->rooms; i++)
 			{
-				for (int currentOperation = 0; currentOperation < counterDayOrder[currentRoom] && this->timeLeft[currentRoom] != 0; currentOperation++)
+				stopLoop = 0;
+				for (int roomAmmount = (this->rooms * this->days) - this->rooms; roomAmmount < this->rooms * this->days; roomAmmount++)
 				{
-					for (int roomToSwap = (this->rooms * currentDay) - this->rooms; roomToSwap < (this->rooms * currentDay) && this->timeLeft[currentRoom] != 0; roomToSwap++)
+					if (this->timeLeft[roomAmmount] < this->shortTime)
 					{
-						if (roomToSwap != currentRoom)
-						{
-							for (int operationToSwap = 0; operationToSwap < counterDayOrder[roomToSwap] && this->timeLeft[roomToSwap] != 0 && this->timeLeft[currentRoom] != 0; operationToSwap++)
-							{
-								if (this->operationRooms[currentRoom][currentOperation].getTime() + this->timeLeft[currentRoom] == this->operationRooms[roomToSwap][operationToSwap].getTime())
-								{
-									this->timeLeft[currentRoom] = this->timeLeft[currentRoom] + this->operationRooms[currentRoom][currentOperation].getTime() - this->operationRooms[roomToSwap][operationToSwap].getTime();
-									this->timeLeft[roomToSwap] = this->timeLeft[roomToSwap] - this->operationRooms[currentRoom][currentOperation].getTime() + this->operationRooms[roomToSwap][operationToSwap].getTime();
-									cout << "CHANGE: Swapping operation with ID " << this->operationRooms[currentRoom][currentOperation].getID() << " with operation " << this->operationRooms[roomToSwap][operationToSwap].getID() << "." << endl;
-									swap(this->operationRooms[currentRoom][currentOperation], this->operationRooms[roomToSwap][operationToSwap]);
-								}
-							}
-						}
+						stopLoop++;
 					}
 				}
-			}
-			// Läser in operationer så länge det går på samtliga operationssalar.
-			for (int i = 0; i < nrOffOperations && this->theOperations.length() != 0; i++)
-			{
+
 				counterRooms = (this->rooms * currentDay) - this->rooms;
 				// Skapar en operation med första elementet från listan.
 				try
@@ -263,8 +256,39 @@ void OperationHandler::schedule(int updatesPerDay)
 			{
 				this->theOperations.insertAt(0, this->returnList.takeFirst());
 			}
-
+			endOp = clock();
+			printOperations();
+			cout << endl << "Time Round 1: " << endOp - startOp << endl;
+			cout << endl << "----- ROUND 2" << " DAY " << currentDay << " -----" << endl;
+			startOp = clock();
+			for (int currentRoom = (this->rooms * currentDay) - this->rooms; currentRoom < (this->rooms * currentDay); currentRoom++)
+			{
+				for (int currentOperation = 0; currentOperation < counterDayOrder[currentRoom] && this->timeLeft[currentRoom] != 0; currentOperation++)
+				{
+					for (int roomToSwap = (this->rooms * currentDay) - this->rooms; roomToSwap < (this->rooms * currentDay) && this->timeLeft[currentRoom] != 0; roomToSwap++)
+					{
+						if (roomToSwap != currentRoom)
+						{
+							for (int operationToSwap = 0; operationToSwap < counterDayOrder[roomToSwap] && this->timeLeft[roomToSwap] != 0 && this->timeLeft[currentRoom] != 0; operationToSwap++)
+							{
+								if (this->operationRooms[currentRoom][currentOperation].getTime() + this->timeLeft[currentRoom] == this->operationRooms[roomToSwap][operationToSwap].getTime())
+								{
+									this->timeLeft[currentRoom] = this->timeLeft[currentRoom] + this->operationRooms[currentRoom][currentOperation].getTime() - this->operationRooms[roomToSwap][operationToSwap].getTime();
+									this->timeLeft[roomToSwap] = this->timeLeft[roomToSwap] - this->operationRooms[currentRoom][currentOperation].getTime() + this->operationRooms[roomToSwap][operationToSwap].getTime();
+									cout << "CHANGE: Swapping operation with ID " << this->operationRooms[currentRoom][currentOperation].getID() << " with operation " << this->operationRooms[roomToSwap][operationToSwap].getID() << "." << endl;
+									swap(this->operationRooms[currentRoom][currentOperation], this->operationRooms[roomToSwap][operationToSwap]);
+								}
+							}
+						}
+					}
+				}
+			}
+			endOp = clock();
+			printOperations();
+			cout << endl << "Time Round 2: " << endOp - startOp << endl;
+			cout << endl << "----- ROUND 3" << " DAY " << currentDay << " -----" << endl;
 			// Kontrollerar om det går att byta med listan för att få optimal tid.
+			startOp = clock();
 			for (int currentRoom = (currentDay * this->rooms) - this->rooms; currentRoom < (this->rooms * currentDay); currentRoom++)
 			{
 				for (int nrOfOperationsInList = this->theOperations.length(); nrOfOperationsInList > 0 && this->timeLeft[currentRoom] != 0; nrOfOperationsInList--)
@@ -288,6 +312,13 @@ void OperationHandler::schedule(int updatesPerDay)
 							timeFind = true;
 						}
 					}
+					if (timeLeft[currentRoom] >= holder.getTime() && !timeFind)
+					{
+						cout << "CHANGE: Adding operation with ID " << holder.getID() << " to operationroom " << counterRooms << "." << endl;
+						this->timeLeft[currentRoom] -= holder.getTime();
+						this->operationRooms[counterRooms][counterDayOrder[counterRooms]] = holder;
+						timeFind = true;
+					}
 					if (!timeFind)
 					{
 						this->returnList.insertAt(0, holder);
@@ -300,8 +331,10 @@ void OperationHandler::schedule(int updatesPerDay)
 					this->theOperations.insertAt(0, this->returnList.takeFirst());
 				}
 			}
+			endOp = clock();
 			printOperations();
-		}
+			cout << endl << "Time Round 3: " << endOp - startOp << endl;
+		//}
 	}
 
 	delete[] counterDayOrder;
